@@ -6,14 +6,21 @@ const Comment = require('./Comment');
 const postSchema = new Schema({
     userId: {
         type: mongoose.ObjectId,
-        required: true,
-        unique: true,
-        trim: true,
-        lowercase: true
+        required: true
+    },
+    private: {
+        type: Boolean,
+        required: false,
+        default: false
+    },
+    fullPath: {
+        type: String,
+        required: true
     },
     title: {
         type: String,
-        required: true
+        required: true,
+        maxlength: 30
     },
     imageUrl: {
         type: String,
@@ -33,6 +40,10 @@ const postSchema = new Schema({
     comments: {
         type: [Comment.commentSchema],
         required: false
+    },
+    description: {
+        type: String,
+        required: true,
     }
 });
 

@@ -108,4 +108,12 @@ module.exports = {
         })
       );
   },
+
+  searchProfile: (req, res) => {
+    User.findOne({ username: req.body.username }).then(user => {
+      res.redirect(`/profile/${user._id}/posts`)
+    }).catch(error => {
+      res.status(404).redirect('/');
+    })
+  }
 };

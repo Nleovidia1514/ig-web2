@@ -2,6 +2,8 @@ var express = require("express");
 var router = express.Router();
 
 var userController = require("../controllers/userController");
+var postsController = require("../controllers/postController");
+
 const passport = require("passport");
 
 /* GET users listing. */
@@ -33,19 +35,20 @@ router
   })
   .post(userController.registerUser);
 
+router.post('/searchUser', userController.searchProfile);
+
 router
-  .route("/profile/:section")
+  .route("/profile/:userId/:section")
   .get((req, res) => {
-    if (!req.user) {
-      res.redirect("/login");
-      return;
+    if (req.params.section === "posts") {
+      return postsController.getPostsByUser(req, res);
     }
     res.render("auth/profile");
   })
   .post((req, res) => {
     if (req.params.section === "security") {
       userController.updatePassword(req, res);
-    } else {
+    } else if (req.params.section === "personal") {
       userController.updateInfo(req, res);
     }
   });

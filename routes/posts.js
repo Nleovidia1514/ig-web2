@@ -20,17 +20,22 @@ const storage = multer.diskStorage({
     return cb(null, "");
   },
   filename: (req, file, cb, filename) => {
-    console.log(file)
+    console.log(file);
     cb(null, uuid() + path.extname(file.originalname));
   },
 });
 
-router.get("/post", postsController.getPosts);
+router
+  .route("/post")
+  .get(postsController.getPosts)
+  .delete(postsController.deletePost);
 router
   .route("/post/upload")
   .get((req, res) => {
-      res.render("posts/upload")
+    res.render("posts/upload");
   })
   .post(multer({ storage }).single("image"), postsController.uploadPost);
+
+  router.route('/makePrivate').put(postsController.makePrivate);
 
 module.exports = router;

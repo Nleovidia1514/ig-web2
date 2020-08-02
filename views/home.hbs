@@ -11,7 +11,10 @@
                     <img class="img-responsive w-100" src="{{imageUrl}}" alt="">
                 </div>
                 <div class="card-footer">
-                    {{uploader.username}} - {{createdDate}}
+                    <a href="/profile/{{uploader._id}}/posts">{{uploader.username}}</a> - {{createdDate}}
+                    <p>
+                        {{description}}
+                    </p>
                 </div>
             </div>
         </div>

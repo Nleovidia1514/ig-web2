@@ -1,19 +1,21 @@
 const Comment = require("../models/Comment");
 const Post = require("../models/Post");
+const mongoose = require("mongoose");
+const fs = require("fs-extra");
 
 const months = [
-  'Enero',
-  'Febrero',
-  'Marzo',
-  'Abril',
-  'Mayo',
-  'Junio',
-  'Julio',
-  'Agosto',
-  'Septiembre',
-  'Octubre',
-  'Noviembre',
-  'Diciembre'
+  "Enero",
+  "Febrero",
+  "Marzo",
+  "Abril",
+  "Mayo",
+  "Junio",
+  "Julio",
+  "Agosto",
+  "Septiembre",
+  "Octubre",
+  "Noviembre",
+  "Diciembre",
 ];
 
 module.exports = {
@@ -27,33 +29,104 @@ module.exports = {
           as: "uploader",
         },
       },
+      {
+        $match: {
+          private: false
+        }
+      }
     ]);
-
+    console.log(posts);
     res.render("home", {
       posts: posts.map((x) => ({
         ...x,
         uploader: x.uploader[0],
-        createdDate: `${x.createdDate.getUTCDate()} de ${months[x.createdDate.getUTCMonth()]} del ${x.createdDate.getFullYear()}`
+        createdDate: `${x.createdDate.getUTCDate()} de ${
+          months[x.createdDate.getUTCMonth()]
+        } del ${x.createdDate.getFullYear()}`,
       })),
     });
+  },
+
+  getPostsByUser: async (req, res) => {
+    const posts = await Post.aggregate([
+      {
+        $lookup: {
+          from: "users",
+          localField: "userId",
+          foreignField: "_id",
+          as: "uploader",
+        },
+      },
+      {
+        $match:
+          req.user != undefined && req.user._id == req.params.userId
+            ? {
+                userId: mongoose.Types.ObjectId(req.params.userId),
+              }
+            : {
+                private: false,
+                userId: mongoose.Types.ObjectId(req.params.userId),
+              },
+      },
+    ]);
+    console.log(posts);
+    res.render("auth/profile", {
+      posts: posts.map((x) => ({
+        ...x,
+        uploader: x.uploader[0],
+        createdDate: `${x.createdDate.getUTCDate()} de ${
+          months[x.createdDate.getUTCMonth()]
+        } del ${x.createdDate.getFullYear()}`,
+      })),
+    });
+  },
+
+  makePrivate: (req, res) => {
+    if (req.query.id) {
+      Post.updateOne({ _id: req.query.id }, {
+        $set: {
+          private: req.query.rev ? false : true
+        }
+      }).then(() => {
+        res.status(200).json({
+          msg: 'Hecha privada con exito'
+        })
+      })
+    }
   },
 
   uploadPost: (req, res) => {
     console.log(req.file);
     if (req.user) {
       const post = new Post();
+      post.fullPath = req.file.path;
       post.userId = req.user._id;
       post.title = req.body.title;
+      post.description = req.body.description;
       post.imageUrl = `/images/uploads/${req.user.username}/${req.file.filename}`;
       post
         .save()
         .then((image) => {
           return res.status(200).redirect("/");
         })
-        .catch((err) => res.status(400).json({ msg: err.message }));
+        .catch((err) => {
+          fs.unlink(req.file.path);
+          res.json({ error: err.message });
+        });
     } else {
       return res.status(401).json({
         msg: "Must be logged in to upload images.",
+      });
+    }
+  },
+
+  deletePost: (req, res) => {
+    if (req.query.id) {
+      Post.findOneAndDelete({ _id: req.query.id }).then((post) => {
+        fs.unlink(post.fullPath);
+        res.json({
+          message: "Post delted successfully",
+        });
       });
     }
   },
