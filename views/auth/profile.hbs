@@ -1,0 +1,31 @@
+<div class="container-fluid bg-dark">
+    <div class="row p-5">
+        <div class="col-12 col-md-3">
+            <div class="card">
+                <img src="https://cnnespanol.cnn.com/wp-content/uploads/2019/12/s_64a163f16ecbb099e52f2f8271f73cbbfcfc9034be4d646f7375e4db1ca6f3d7_1573501883482_ap_19001106049831-1.jpg?quality=100&strip=info&w=320&h=240&crop=1"
+                    alt="">
+            </div>
+            <nav class="navbar bg-light bg-dark">
+
+                <!-- Links -->
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/profile/personal">Datos Personales</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/profile/security">Seguridad</a>
+                    </li>
+                </ul>
+
+            </nav>
+        </div>
+        <form class="col-12 col-md-9" action="" method="POST">
+            {{#contains url 'security'}}
+            {{> profile/security}}
+            {{/contains}}
+            {{#contains url 'personal'}}
+            {{> profile/personalInfo}}
+            {{/contains}}
+        </form>
+    </div>
+</div>

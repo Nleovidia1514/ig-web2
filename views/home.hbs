@@ -1,0 +1,20 @@
+<div class="container-fluid">
+    <div class="row">
+
+        {{#each posts}}
+        <div class="col-12 col-md-6 offset-md-3 mb-4 mt-4">
+            <div class="card">
+                <div class="card-header">
+                    {{title}}
+                </div>
+                <div class="card-content">
+                    <img class="img-responsive w-100" src="{{imageUrl}}" alt="">
+                </div>
+                <div class="card-footer">
+                    {{uploader.username}} - {{createdDate}}
+                </div>
+            </div>
+        </div>
+        {{/each}}
+    </div>
+</div>
